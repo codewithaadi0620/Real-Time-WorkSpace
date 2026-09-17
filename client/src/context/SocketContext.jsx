@@ -6,7 +6,7 @@ const SocketContext = createContext(null);
 
 const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || 
   (typeof window !== 'undefined' && window.location.hostname !== 'localhost' 
-    ? 'https://collaborative-workspace-api.onrender.com' 
+    ? window.location.origin 
     : 'http://localhost:5000');
 
 export const SocketProvider = ({ children }) => {
