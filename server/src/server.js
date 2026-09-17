@@ -71,6 +71,10 @@ async function startServer() {
   }
 }
 
-startServer();
+if (require.main === module) {
+  startServer();
+} else {
+  initializeDatabase().catch(() => {});
+}
 
 module.exports = { app, server };

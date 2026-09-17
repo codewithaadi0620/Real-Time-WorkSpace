@@ -15,26 +15,30 @@ async function initializeDatabase() {
       );
     `);
 
-    const tablesExist = checkRes.rows[0].exists;
+    const tablesExist = checkRes.rows[0]?.exists;
 
     if (!tablesExist) {
-      console.log('🚀 Running database schema migration (001_init_schema.sql)...');
       const migrationPath = path.resolve(__dirname, '../../../database/migrations/001_init_schema.sql');
-      const migrationSql = fs.readFileSync(migrationPath, 'utf8');
-      await db.query(migrationSql);
-      console.log('✅ Schema migration completed.');
-
-      console.log('🌱 Seeding demo database data (001_seed_demo_data.sql)...');
       const seedPath = path.resolve(__dirname, '../../../database/seed/001_seed_demo_data.sql');
-      const seedSql = fs.readFileSync(seedPath, 'utf8');
-      await db.query(seedSql);
-      console.log('✅ Demo data seeded successfully.');
+
+      if (fs.existsSync(migrationPath)) {
+        console.log('🚀 Running database schema migration (001_init_schema.sql)...');
+        const migrationSql = fs.readFileSync(migrationPath, 'utf8');
+        await db.query(migrationSql);
+        console.log('✅ Schema migration completed.');
+      }
+
+      if (fs.existsSync(seedPath)) {
+        console.log('🌱 Seeding demo database data (001_seed_demo_data.sql)...');
+        const seedSql = fs.readFileSync(seedPath, 'utf8');
+        await db.query(seedSql);
+        console.log('✅ Demo data seeded successfully.');
+      }
     } else {
       console.log('ℹ️ Database tables already present. Skipping migration and seed.');
     }
   } catch (error) {
-    console.error('❌ Error during database initialization:', error);
-    // Don't crash hard if migrations fail due to transient issue; log and continue
+    console.error('❌ Error during database initialization:', error.message);
   }
 }
 
